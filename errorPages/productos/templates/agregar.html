@@ -42,7 +42,7 @@
         // Vamos a usar el formulario para hacer un request POST a mi API
         var form = document.getElementById('productoForm');
         // En este caso el event es el comportamiento del formulario
-        form.addEventListener('sumbit', function(event){
+        form.addEventListener('submit', function(event){
             // Para evitar que se mande un formulario para este contexto
             event.preventDefault();
 
@@ -60,7 +60,7 @@
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRFToken': 'getCSRFToken()'
+                    'X-CSRFToken': getCSRFToken()
                 },
                 body: JSON.stringify(jsonData)
             })
@@ -107,6 +107,7 @@
                 .catch(error => 
                     console.error('Error:', error));
         }
+        cargarProductos();
     </script>
 
 </body>
