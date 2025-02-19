@@ -28,7 +28,7 @@ SECRET_KEY = 'django-insecure-(n^5+vvdp9vy0qbw*1(+j!^%&7wygsof7j&0-wn#c6s@ct$=5z
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     'django.contrib.sitemaps',
     'app',
     'users',
+    'productos',
+    'categorias',
 ]
 
 MIDDLEWARE = [

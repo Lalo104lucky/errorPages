@@ -37,22 +37,20 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        const message = JSON.parse('{{ message|safe }}'); // Convierte el mensaje en un objeto JavaScript
-        
-        if (message) {
-            document.getElementById("modalMessage").innerText =
-                `[${message.tipo.toUpperCase()}] Código ${message.codigo}: ${message.mensaje}`;
-            
-            if (message.imagen) {
-                const imgElement = document.getElementById("modalImage");
-                imgElement.src = message.imagen;
-                imgElement.style.display = "block";
-            }
-            
-            const modal = new bootstrap.Modal(document.getElementById('messageModal'));
-            modal.show(); // Mostrar el modal
+        const message = {{ message | safe }}; // El mensaje se pasa desde Django
+    if (message) {
+        document.getElementById("modalMessage").innerText =
+            `[${message.typr.toUpperCase()}] Código ${message.code}: ${message.message}`;
+        if (message.img) {
+            const imgElement = document.getElementById("modalImage");
+            imgElement.src = message.img;
+            imgElement.style.display = "block";
         }
-    });
+        const modal = new
+            bootstrap.Modal(document.getElementById('messageModal'));
+        modal.show();
+    }
+});
 </script>
 
 
