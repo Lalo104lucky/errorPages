@@ -6,4 +6,5 @@ urlpatterns = [
     path('registrar/', registrarCategoria, name='registrar'),
     path('api/get/', jsonCategoria, name='lista'),
     path('json/', json1_view, name='json'),
+    path('api/post/', registrar_categoria, name='post'),
 ]

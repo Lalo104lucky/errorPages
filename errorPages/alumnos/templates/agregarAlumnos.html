@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agregar Alumno</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+
+</head>
+
+<body>
+    <div class="container">
+        <div class="col">
+            <div class="row">
+
+                <!-- Fomrulario -->
+                <div class="col-6 mt-3">
+                    <h1>Agregar Alumno</h1>
+                    <form method="post" id="alumnoForm">
+                        {% csrf_token %}
+                        <div id="alumnoIdContainer" style="display: none;">
+                            <label for="alumnoId" class="form-label">Id</label>
+                            <input type="text" id="alumnoId" name="id" class="form-control" />
+                        </div>
+                        {{ form.as_p}}
+                        <button type="submit" class="btn btn-primary">Agregar</button>
+                    </form>
+                    <div>
+                        <p id="mensaje"></p>
+                    </div>
+                </div>
+
+                <div id="spinner" class="text-center col" style="display: block;">
+                    <div class="spinner-border text-primary" role="status">
+                    </div>
+                    <span>Cargando...</span>
+                </div>
+
+                <!-- Lista de alumnos -->
+                <div class="col-6 mt-3">
+                    <h1>Ver Alumnos</h1>
+                    <div class="row" id="alumnos">
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toogleSpinner(show) {
+            document.getElementById('spinner').style.display = show ? 'block' : 'none';
+        }
+    </script>
+
+    <script>
+        // Vamos a usar el formulario para hacer un request POST a mi API
+        var form = document.getElementById('alumnoForm');
+        // En este caso el event es el comportamiento del formulario
+        form.addEventListener('submit', function (event) {
+            // Para evitar que se mande un formulario para este contexto
+            event.preventDefault();
+
+            // Obtener los datos del formulario
+            let formData = new FormData(this);
+
+            // Combertir los datos a json
+            let jsonData = {};
+
+            // En este contexto el valor es el dato de input y la key es el "name"
+            formData.forEach((value, key) => jsonData[key] = value);
+
+            // Datos para hacer el PUT
+            let alumnoId = document.getElementById('alumnoId').value;
+            let method = alumnoId ? 'PUT' : 'POST';
+            let url = alumnoId ? `/alumnos/api/${alumnoId}/` : '/alumnos/api/';
+
+            // Enviar estos datos al servidor
+            // fetch 
+            toogleSpinner(true);
+            fetch(url, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(jsonData)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    cargarAlumnos();
+                    form.reset();
+                    document.getElementById('alumnoId').value = '';
+                    document.getElementById('alumnoIdContainer').style.display = 'none';
+                    if (method === 'PUT') {
+                        window.location.reload();
+                    }
+                })
+                .catch(error => console.error('Error:', error))
+                .finally(() => toogleSpinner(false));
+        });
+
+        // Función para obtener el token CSRF de la cookie de Django
+
+        // function getCSRFToken() {
+        //     let cookieValue = null;
+        //     let cookies = document.cookie.split(';');
+        //     for (let i = 0; i < cookies.length; i++) {
+        //         let cookie = cookies[i].trim();
+        //         if (cookie.startsWith('csrftoken=')) {
+        //             cookieValue = cookie.substring('csrftoken='.length, cookie.length);
+        //             break;
+        //         }
+        //     }
+        //     return cookieValue;
+        // }
+
+        function cargarAlumnos() {
+            toogleSpinner(true);
+            fetch('/alumnos/api/')
+                .then(response => response.json())
+                .then(data => {
+                    let productosDiv = document.getElementById('alumnos')
+                    productosDiv.innerHTML = "";
+                    data.forEach(alumno => {
+                        productosDiv.innerHTML += `
+<div class="col-12">
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered text-center align-middle">
+            <thead class="">
+                <tr>
+                    <th>Nombre Completo</th>
+                    <th>Correo</th>
+                    <th>Edad</th>
+                    <th>Matrícula</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>${alumno.nombre} ${alumno.apellido}</td>
+                    <td>${ca.correo}</td>
+                    <td>${alumno.edad}</td>
+                    <td>${alumno.matricula}</td>
+                    <td class="text-center">
+                        <div class="d-flex justify-content-center gap-2">
+                            <button class="btn btn-warning btn-sm" onclick="editarAlumno(${alumno.id})">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button class="btn btn-danger btn-sm" onclick="eliminarAlumno(${alumno.id})">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+                        `
+                    })
+                })
+                .catch(error =>
+                    console.error('Error:', error))
+                .finally(() => toogleSpinner(false));
+        }
+
+        function eliminarAlumno(id) {
+            if (confirm('¿Estás seguro de eliminar este alumno?')) {
+                toogleSpinner(true);
+                fetch(`/alumnos/api/${id}/`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            document.getElementById('mensaje').innerText = 'Alumno eliminado exitosamente';
+                            cargarAlumnos();
+                        } else {
+                            document.getElementById('mensaje').innerText = 'Error al eliminar el alumno';
+                        }
+                    })
+                    .catch(error => console.error('Error:', error))
+                    .finally(() => toogleSpinner(false));
+            }
+        }
+
+        function editarAlumno(id) {
+            fetch(`/alumnos/api/${id}/`)
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    document.getElementById('alumnoId').value = data.id;
+                    document.getElementById('alumnoIdContainer').style.display = 'block';
+                    document.getElementById('id_nombre').value = data.nombre;
+                    document.getElementById('id_apellido').value = data.apellido;
+                    document.getElementById('id_correo').value = data.correo;
+                    document.getElementById('id_edad').value = data.edad;
+                    document.getElementById('id_matricula').value = data.matricula;
+                })
+                .catch(error =>
+                    console.error('Error:', error)
+                );
+        }
+
+        cargarAlumnos();
+    </script>
+
+</body>
+
+</html>

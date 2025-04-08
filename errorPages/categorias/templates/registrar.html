@@ -8,12 +8,92 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 <body>
-    <h1>Agregar Categoria</h1>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p}}
-        <button type="submit">Agregar</button>
-    </form>
-    <a href="{% url 'ver' %}">Ver Categorias</a>
+    <div class="container">
+        <div class="col">
+            <div class="row">
+
+                <div class="col-6 mt-3">
+                    <h1>Agregar Categoria</h1>
+                    <form method="post" id="categoriaForm">
+                        {% csrf_token %}
+                        {{ form.as_p}}
+                        <button type="submit" class="btn btn-primary">Agregar</button>
+                    </form>
+                    <div>
+                        <p id="mensaje"></p>
+                    </div>
+                    <a href="{% url 'ver' %}">Ver Categorias</a>
+                </div>
+
+                <div class="col-6 mt-3">
+                    <h1>Ver Categorias</h1>
+                    <div class="row" id="categorias">
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Vamos a usar el formulario para hacer un request POST a mi API
+        var form = document.getElementById('categoriaForm');
+        // En este caso el event es el comportamiento del formulario
+        form.addEventListener('submit', function (event) {
+            // Para evitar que se mande un formulario para este contexto
+            event.preventDefault();
+
+            // Obtener los datos del formulario
+            let formData = new FormData(this);
+
+            // Combertir los datos a json
+            let jsonData = {};
+            // En este contexto el valor es el dato de input y la key es el "name"
+            formData.forEach((value, key) => jsonData[key] = value);
+
+            // Enviar estos datos al servidor
+            // fetch 
+            fetch('/categorias/api/post/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify(jsonData)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('mensaje').innerText = 'Registro exitoso'
+                    // Repintar los elementos
+                    cargarCategorias();
+                })
+                .catch(error => console.error('Error:', error));
+        });
+
+        // Función para obtener el token CSRF de la cookie de Django
+
+        
+
+        function cargarCategorias() {
+            fetch('/categorias/api/get/')
+                .then(response => response.json())
+                .then(data => {
+                    let categoriasDiv = document.getElementById('categorias')
+                    categoriasDiv.innerHTML = "";
+                    data.forEach(categoria => {
+                        categoriasDiv.innerHTML += `
+                            <div class="col-3">
+                                <strong>${categoria.nombre}</strong>
+                                <img src="${categoria.imagen}" alt="Sin imagen" width="100px" height="auto">
+                            </div>
+                        `
+                    })
+                })
+                .catch(error =>
+                    console.error('Error:', error));
+        }
+        cargarCategorias();
+    </script>
 </body>
 </html>

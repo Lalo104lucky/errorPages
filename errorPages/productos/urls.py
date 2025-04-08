@@ -1,11 +1,14 @@
-from django.urls import path
+from django.urls import path, include
+from rest_framework.routers import SimpleRouter
+from .views import ProductoViewSet
+from .views import agregar_producto
 from .views import *
 
+router = SimpleRouter()
+router.register(r'api', ProductoViewSet )
+
 urlpatterns = [
-    path('ver/', ver_productos, name='ver'),
-    path('agregar/', agregarProducto, name='agregar'),
-    path('api/get/', lista_productos, name='lista'),
-    path('json/', json_view, name='json'),
-    path('api/post/', registrar_producto, name='post'),
-    
+    path('', include(router.urls)),
+    path('agregar/', agregar_producto, name='agregar_producto'),
+    path('prueba/', prueba_view, name='prueba')
 ]

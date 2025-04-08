@@ -10,7 +10,7 @@ class productoForm(forms.ModelForm):
         model = Producto
 
         # Definir que campos van a ser incluidos en el formulario
-        fields = ['nombre', 'precio', 'imagen']
+        fields = ['nombre', 'precio', 'imagen', 'categoria']
 
         # Definir como se deben de ver o atributos tienen los campos
         widgets= {
@@ -32,6 +32,12 @@ class productoForm(forms.ModelForm):
                 attrs= {
                     'class': 'form-control',
                     'placeholder': 'URL de la imagen del producto',
+                    'required': True
+                }
+            ),
+            'categoria': forms.Select(
+                attrs= {
+                    'class': 'form-control',
                     'required': True
                 }
             )

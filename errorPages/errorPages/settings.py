@@ -45,6 +45,10 @@ INSTALLED_APPS = [
     'users',
     'productos',
     'categorias',
+    'rest_framework',
+    'alumnos',
+    'rest_framework_simplejwt',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -55,6 +59,18 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
+]
+
+# CORS_ALLOW_ALL_ORIGINS = True
+
+CORS_ALLOWED_ORIGINS = [
+    # IPS de las cuales ya tengo confianza
+    "http://127.0.0.1:8000",
+    "http://localhost:8000",
+    "http://127.0.0.1:5173",
+    "http://localhost:5173",
 ]
 
 ROOT_URLCONF = 'errorPages.urls'
@@ -148,3 +164,19 @@ AUTH_USER_MODEL = 'users.CustomUser'
 LOGIN_URL = '/users/login/' 
 LOGIN_REDIRECT_URL = '/home'  # Dónde irán los usuarios tras iniciar sesión 
 LOGOUT_REDIRECT_URL = '/users/login/' 
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
+}
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+#Configuración para Gmail
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+# Usar su correo de UTEZ
+EMAIL_HOST_USER = "20223tn021@utez.edu.mx"
+# Obtener de https://myaccount.google.com/apppasswords
+EMAIL_HOST_PASSWORD = "dyeb wjnf xvki sbxm"
